@@ -68,5 +68,13 @@ def main():
         cv2.destroyAllWindows()
 
 
+def get_currentitem():
+    global CURRCATEGORY
+    main()
+    return CURRCATEGORY
+
+        
+
+
 if __name__ == "__main__":
     main()
