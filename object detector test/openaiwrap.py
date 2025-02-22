@@ -1,11 +1,12 @@
 import requests
 import json
+import config
 
 def openai_sound(item):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
+        "Authorization": "Bearer " + config.openapi_key
     }
 
     payload = {
