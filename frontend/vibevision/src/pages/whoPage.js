@@ -1,34 +1,72 @@
-import './homePage.css';
-import { 
-  Box, ButtonGroup, Button, ButtonBase, Table, TableBody, TextField,
-  TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox, TableSortLabel, 
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
-} from '@mui/material';
+import './whatPage.css';
+import { Box, ButtonGroup, Button, ButtonBase } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-function whoPage() {
-  return (
-    <>
-      <Box className="nav-box">
-        <ButtonGroup variant="text">
-          <Button className="nav-buttongroup" >What is it?</Button>
-          <Button className="nav-buttongroup" >How does it work?</Button>
-          <Button className="nav-buttongroup">Who made it?</Button>
-        </ButtonGroup>
-      </Box>
+function WhoPage() {
+    const navigate = useNavigate();
 
-      <div className="logo-container">
-        <ButtonBase className="logo">
-          <img src="/images/vibe2.png" alt="Clickable" className="image" />
-        </ButtonBase>
-      </div>
-      <div className="text">
-        Every Object is an Instrument—<br />Compose Your Reality
-      </div>
-      <div className='button-box'>
-        <Button variant="contained" className='button'>Try It!</Button>
-      </div>
-    </>
-  );
+    function gotoHomePage() {
+        try {
+            navigate("/");
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    function gotoWhatPage() {
+        try {
+            navigate("/what");
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    function gotoWhoPage() {
+        try {
+            navigate("/who");
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    function gotoHowPage() {
+        try {
+            navigate("/how");
+        } catch (error) {
+            alert(error);
+        }
+    }
+
+    return (
+        <>
+            <Box className="nav-box">
+                <ButtonGroup variant="text">
+                    <Button className="nav-buttongroup" onClick={gotoWhatPage}>What?</Button>
+                    <Button className="nav-buttongroup" onClick={gotoHowPage}>How?</Button>
+                    <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
+                </ButtonGroup>
+            </Box>
+
+            <div className="logo-container">
+                <ButtonBase className="logo" onClick={gotoHomePage}>
+                    <img src="/images/vibe2.png" alt="Clickable" className="image" />
+                </ButtonBase>
+            </div>
+
+            <div className="text-container">
+                <div className="title-text">
+                    Who made VibeVision?
+                </div>
+
+                <div className="desc-text">
+                    Our names are Maisha Iqbal and Roshan Nunna. <br/>
+                    We are two graduating seniors @ RIT in Software Engineering and Computer Science, respectively. <br/>
+                    We made this fun project during RIT's annual hackathon: Brickhack 11. <br/>
+                    Fun fact: This is inspired by a project we collaborated on during our first Brickhack (7) in our freshman year. <br/>
+                    </div>
+            </div>
+        </>
+    );
 }
 
-export default whoPage;
+export default WhoPage;
