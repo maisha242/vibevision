@@ -52,6 +52,18 @@ function WhatPage() {
                     <img src="/images/vibe2.png" alt="Clickable" className="image" />
                 </ButtonBase>
             </div>
+
+            <div className="text-container">
+                <div className="title-text">
+                    What is VibeVision?
+                </div>
+
+                <div className="desc-text">
+                    VibeVision is an interactive experience that combines real-time object detection with immersive soundscapes. <br/>
+                    Using your camera, it detects objects in your environment and triggers sound effects with each item.<br/>
+                    From bass drops to synth melodies, VibeVision turns everyday objects into musical instruments.<br/>
+                </div>
+            </div>
         </>
     );
 }
