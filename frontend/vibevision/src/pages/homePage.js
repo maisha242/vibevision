@@ -42,17 +42,45 @@ function HomePage() {
 
   async function startModel() {
     try {
-      const response = await fetch("http://127.0.0.1:5000/call_function?param=hello"); 
+      const response = await fetch("http://127.0.0.1:5000/call_function?param=hello");
+  
       if (!response.ok) {
         alert("Failed to fetch data");
+        return;
       }
   
-      const data = await response.json();
-      return data.result
+      // Since it's a stream, you need to handle it differently
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let result = '';
+      
+      // Continuously read from the stream
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        result += decoder.decode(value, { stream: true });
+        console.log("Streamed data:", result);
+        
+        // Handle or process your data here (for example, extracting the word)
+        // You can implement some logic to extract the word from the stream or trigger a callback
+        const word = extractWordFromStream(result);
+        if (word) {
+          searchSounds(word);  // Call searchSounds when word is found
+        }
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
+  
+  function extractWordFromStream(streamData) {
+    // Implement your logic here to extract the word from the streamData
+    // For example, if the stream sends "data: 1", extract the "1" part
+    const matches = streamData.match(/data:\s*(\w+)/);
+    return matches ? matches[1] : null;
+  }
+  
   
 
   async function freesound_auth() {
@@ -124,9 +152,9 @@ function HomePage() {
 
   async function tryit(){
     freesound_auth();
-    const word = await startModel();
-    console.log("Playing sound for: ", word)
-    searchSounds(word)
+    startModel();
+    //console.log("Playing sound for: ", word)
+   // searchSounds(word)
   }
 
   return (
