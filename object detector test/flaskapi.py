@@ -7,7 +7,6 @@ app = Flask(__name__)
 
 # Allow all origins
 CORS(app, resources={r"/*": {"origins": "*"}})
-
 @app.route('/call_function', methods=['GET'])
 def call_function():
     # Retrieve any parameters from the GET request if needed
@@ -19,7 +18,11 @@ def call_function():
         for chunk in soundfromimage.main():
             if chunk != None:
                 # Emit the collision name as a message
-                yield f"data: {chunk}\n\n"  # Send chunk (nameCollision) as a message to the client
+                if (last_chunk == None):
+                    last_chunk = chunk
+                if (last_chunk != None and chunk != last_chunk):
+                    yield f"data: {chunk}\n\n"  # Send chunk (nameCollision) as a message to the client
+
 
 
     return Response(stream_event(), mimetype="text/event-stream")

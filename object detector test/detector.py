@@ -84,7 +84,7 @@ def main():
 
         # Process detection results.
         if detection_result.detections:
-            print(f"Detected {len(detection_result.detections)} objects.")
+            #print(f"Detected {len(detection_result.detections)} objects.")
 
             # Draw bounding boxes for each detected object.
             for detection in detection_result.detections:
@@ -94,10 +94,10 @@ def main():
                 y = int(bbox.origin_y)
                 w = int(bbox.width)
                 h = int(bbox.height)
-                print(f"Bounding box: x={x}, y={y}, w={w}, h={h}")
+                #print(f"Bounding box: x={x}, y={y}, w={w}, h={h}")
 
                 height, width, _ = numpy_image.shape
-                print(f"Bounding box: x={x}, y={y}, w={w}, h={h}, height={height}, width={width}")
+                #print(f"Bounding box: x={x}, y={y}, w={w}, h={h}, height={height}, width={width}")
 
                 if w + x > width or y + h > height:
                     pass
