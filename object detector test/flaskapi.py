@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 # Allow all origins
 CORS(app, resources={r"/*": {"origins": "*"}})
+
 @app.route('/call_function', methods=['GET'])
 def call_function():
     # Retrieve any parameters from the GET request if needed
@@ -14,18 +15,16 @@ def call_function():
 
     # Call the function from another file
     def stream_event():
-        # for chunk in soundfromimage.main():
-        #     if (chunk != None):
-        #         yield chunk + "\n"
-        #     else:
-        #         break
+        last_chunk = None  # Keep track of the last chunk
 
-        for i in range(1, 20):
-            yield str(i) + "\n"
+        for chunk in soundfromimage.main():
+            if chunk != None and chunk != last_chunk:  # Check if the chunk is different from the last one
+                yield chunk + "\n"
+                last_chunk = chunk  # Update last_chunk to the current chunk
+            else:
+                break
+
     return Response(stream_event(), mimetype="text/event-stream")
-
-    # Return the result as a response to the GET request
-    #return jsonify({"result": result})
 
 @app.route('/stream', methods=['GET'])
 def call_stream():
