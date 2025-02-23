@@ -14,7 +14,7 @@ def call_function():
     def stream_event():
         last_chunk = None  # To track the previous chunk
 
-        for chunk in soundfromimage.main():
+        for chunk in soundfromimage.norm():
             if chunk != None:
                 # Emit the collision name as a message
                 if (last_chunk == None):
@@ -26,12 +26,12 @@ def call_function():
 @app.route('/call_function_exp', methods=['GET'])
 def call_function_exp():
     # Retrieve any parameters from the GET request if needed
-    param = request.args.get('param', default=None)
+   # param = request.args.get('param', default=None)
 
     def stream_event():
         last_chunk = None  # To track the previous chunk
 
-        for chunk in soundfromimage.main():
+        for chunk in soundfromimage.exp():
             if chunk != None:
                 # Emit the collision name as a message
                 if (last_chunk == None):
