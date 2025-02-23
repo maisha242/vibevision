@@ -39,6 +39,21 @@ function HomePage() {
     }
   }
 
+  async function startModel() {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/call_function?param=hello"); 
+      if (!response.ok) {
+        alert("Failed to fetch data");
+      }
+  
+      const data = await response.json();
+      return data.result
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+
   async function freesound_auth() {
     try {
       const response = await fetch('http://localhost:5001/get_access_token');
@@ -53,52 +68,6 @@ function HomePage() {
   }
 
   let debounceTimeout = null; // Variable to hold the debounce timeout
-
-  async function startModel() {
-    const eventSource = new EventSource("http://127.0.0.1:5000/call_function?param=hello");
-
-    eventSource.onmessage = (event) => {
-      const data = event.data;
-      console.log(data);
-      searchSounds(data);
-    }
-    // try {
-    //   const response = await fetch("http://127.0.0.1:5000/call_function?param=hello");
-
-    //   if (!response.ok) {
-    //     alert("Failed to fetch data");
-    //     return;
-    //   }
-
-    //   const reader = response.body.getReader();
-    //   const decoder = new TextDecoder();
-    //   let result = '';
-    //   let lastItem = "";  // Track the last item detected
-
-    //   while (true) {
-    //     const { done, value } = await reader.read();
-    //     if (done) break;
-
-    //     result = decoder.decode(value, { stream: true });
-    //     if (result.trim() && result.trim() !== lastItem) {
-    //       lastItem = result.trim();  // Update last item
-    //       console.log("found item", lastItem)
-
-    //       // If debounce timeout exists, clear it
-    //       if (debounceTimeout) {
-    //         clearTimeout(debounceTimeout);
-    //       }
-
-    //       // Set new debounce timeout
-    //       debounceTimeout = setTimeout(() => {
-    //         searchSounds(lastItem);  // Call searchSounds after the debounce period
-    //       }, 1000); // 500ms debounce time
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching data:", error);
-    // }
-  }
 
   async function searchSounds(query) {
     try {
@@ -129,23 +98,61 @@ function HomePage() {
       console.error('Error:', error);
     }
   }
-
+  
+  async function generateAndPlayTrack(prompt) {
+    try {
+      const response = await fetch('http://localhost:5001/generate_and_play', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: prompt }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Track generation failed');
+      }
+  
+      const data = await response.json();
+      const trackUrl = data.track_url;
+  
+      // Play the generated track
+      const audio = new Audio(trackUrl);
+      audio.play();
+    } catch (error) {
+      console.error('Error generating and playing track:', error);
+    }
+  }
+  
   function playSound(url) {
     const audio = new Audio(url);
 
     audio.play()
       .then(() => {
         console.log("Sound is playing...");
-        // The sound will continue as long as the object remains the same.
+        // Check if the audio duration is greater than 5 seconds
+        if (audio.duration > 5) {
+          setTimeout(() => {
+            audio.pause(); 
+            console.log("Audio stopped after 5 seconds.");
+          }, 5000); // 5 seconds
+        }
       })
       .catch((error) => {
         console.error("Error playing sound:", error);
       });
   }
 
-  async function tryit() {
+  async function normal() {
     freesound_auth();
     startModel();
+  }
+
+  async function experimental(){
+    freesound_auth();
+    const word = await startModel();
+    console.log("Playing sound for: ", word)
+    generateAndPlayTrack(word);
   }
 
   return (
@@ -167,7 +174,8 @@ function HomePage() {
         Every Object is an Instrument—<br />Compose Your Reality
       </div>
       <div className='button-box'>
-        <Button variant="contained" className='button' onClick={tryit}>Try It!</Button>
+        <Button variant="contained" className='button' onClick={normal}>Normal</Button>
+        <Button variant="contained" className='button' onClick={experimental}>Experimental</Button>
       </div>
     </>
   );
