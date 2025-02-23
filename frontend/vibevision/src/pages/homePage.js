@@ -68,14 +68,10 @@ function HomePage() {
     }
   }
   
-  async function searchSounds(query, filter = "", sort = "score", groupByPack = "0", weights = "") {
+  async function searchSounds(query) {
     try {
       const payload = {
-        query: query,
-        filter: filter,
-        sort: sort,
-        group_by_pack: groupByPack,
-        weights: weights
+        query: query
       };
   
       const response = await fetch('http://localhost:5001/search', {
@@ -89,19 +85,20 @@ function HomePage() {
       if (!response.ok) {
         throw new Error('Search failed');
       }
-      
+  
       const data = await response.json();
-      console.log('Search Results:', data);  
+      console.log('Search Results:', data); 
     } catch (error) {
       console.error('Error:', error);
     }
   }
   
+  
 
   async function tryit(){
     freesound_auth();
-    startModel();
-   // searchSounds("meow")
+   // startModel();
+    searchSounds("rawr")
   }
 
   return (

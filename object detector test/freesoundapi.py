@@ -57,6 +57,35 @@ def get_access_token():
         return jsonify({"access_token": access_token})
     else:
         return jsonify({"error": "Access token not available"}), 400
+    
+@app.route("/search", methods=["POST"])
+def search_sounds():
+    global access_token
+    if not access_token:
+        return jsonify({"error": "Access token not available"}), 400
+
+    data = request.get_json()
+
+    query = data.get("query") #required
+
+    if not query:
+        return jsonify({"error": "Query parameter is required"}), 400
+
+    search_url = "https://freesound.org/apiv2/search/text/"
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+    params = {"query": query}
+
+    # Send the GET request to Freesound's API
+    response = requests.get(search_url, headers=headers, params=params)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        return jsonify(response.json()) 
+    else:
+        return jsonify({"error": "Error with Freesound search", "details": response.text}), 400
+
+
 
 def run_flask():
     app.run(port=5001, debug=True, use_reloader=False)
