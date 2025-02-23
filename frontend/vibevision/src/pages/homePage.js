@@ -62,27 +62,15 @@ function HomePage() {
         result += decoder.decode(value, { stream: true });
         console.log("Streamed data:", result);
         
-        // Handle or process your data here (for example, extracting the word)
-        // You can implement some logic to extract the word from the stream or trigger a callback
-        const word = extractWordFromStream(result);
-        if (word) {
-          searchSounds(word);  // Call searchSounds when word is found
+        if (result) {
+          searchSounds(result);  // Call searchSounds when word is found
         }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-  
-  function extractWordFromStream(streamData) {
-    // Implement your logic here to extract the word from the streamData
-    // For example, if the stream sends "data: 1", extract the "1" part
-    const matches = streamData.match(/data:\s*(\w+)/);
-    return matches ? matches[1] : null;
-  }
-  
-  
-
+    
   async function freesound_auth() {
     try {
       const response = await fetch('http://localhost:5001/get_access_token');
