@@ -41,7 +41,7 @@ function HomePage() {
 
   async function startModel() {
 
-    const eventSource = new EventSource("http://127.0.0.1:5000/call_function?param=hello");
+    const eventSource = new EventSource("http://localhost:5000/call_function");
 
     eventSource.onmessage = (event) => {
       const data = event.data;
@@ -49,7 +49,18 @@ function HomePage() {
       searchSounds(data);
     }
   }
+  
 
+  async function startModel_exp() {
+
+    const eventSource = new EventSource("http://localhost:5000/call_function_exp");
+
+    eventSource.onmessage = (event) => {
+      const data = event.data;
+      console.log(data);
+      generateAndPlayTrack(data);
+    }
+  }
 
   async function freesound_auth() {
     try {
@@ -68,8 +79,10 @@ function HomePage() {
 
   async function searchSounds(query) {
     try {
-      const payload = { query: query };
-
+      const payload = {
+        query: query
+      };
+  
       const response = await fetch('http://localhost:5001/search', {
         method: 'POST',
         headers: {
@@ -77,14 +90,14 @@ function HomePage() {
         },
         body: JSON.stringify(payload)
       });
-
+  
       if (!response.ok) {
         throw new Error('Search failed');
       }
-
+  
       const data = await response.json();
-      console.log('Search Results:', data);
-
+      console.log('Search Results:', data); 
+  
       if (data.preview_url) {
         console.log("Attempting to play sound from URL:", data.preview_url);
         playSound(data.preview_url);  // Play the sound using the preview URL
@@ -147,9 +160,7 @@ function HomePage() {
 
   async function experimental(){
     freesound_auth();
-    const word = await startModel();
-    console.log("Playing sound for: ", word)
-    generateAndPlayTrack(word);
+    startModel_exp();
   }
 
   return (

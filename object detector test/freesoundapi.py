@@ -10,7 +10,8 @@ import time
 BASE_URL = 'https://public-api.beatoven.ai'
 
 app = Flask(__name__)
-CORS(app)
+# Enable CORS for all routes and allow specific methods and headers
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "*"], "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
 
 authurl = "https://freesound.org/apiv2/oauth2/authorize/"
 tokenurl = "https://freesound.org/apiv2/oauth2/access_token/"
@@ -100,6 +101,50 @@ def compose_track(track_id):
         print(f"Error composing track: {e}")
         return None
 
+@app.route("/search", methods=["POST"])
+def search_sounds():
+    global access_token
+    if not access_token:
+        return jsonify({"error": "Access token not available"}), 400
+
+    data = request.get_json()
+
+    query = data.get("query")  # required
+
+    if not query:
+        return jsonify({"error": "Query parameter is required"}), 400
+
+    search_url = "https://freesound.org/apiv2/search/text/"
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+    params = {
+        "query": query,
+        "fields": "id,name,tags,previews"  
+    }
+
+    response = requests.get(search_url, headers=headers, params=params)
+
+    if response.status_code == 200:
+        search_result = response.json()
+
+        if search_result["count"] > 0:
+            first_result = search_result["results"][0]
+
+            # Extract the preview MP3 URL (you can choose between low and high quality)
+            preview_url = first_result["previews"].get("preview-hq-mp3")  # HQ MP3
+            if not preview_url:
+                preview_url = first_result["previews"].get("preview-lq-mp3")  # LQ MP3 as fallback
+
+            if preview_url:
+                return jsonify({"sound_name": first_result["name"], "preview_url": preview_url})
+            else:
+                return jsonify({"error": "No preview URL available"}), 400
+        else:
+            return jsonify({"error": "No results found"}), 404
+
+    else:
+        return jsonify({"error": "Error with Freesound search", "details": response.text}), 400
+    
 # Check the composition status
 def check_composition_status(task_id):
     try:
