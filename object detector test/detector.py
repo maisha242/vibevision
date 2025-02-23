@@ -37,8 +37,7 @@ def detect_collisions(results, frame):
                     # make call to openai
 
                     print("" + nameCollision + " hit!")
-                    return openaiwrap.openai_sound(nameCollision)
-    return ""
+                    return nameCollision
     
 def main():
     # Initialize the webcam (0 for the default webcam).
@@ -116,7 +115,7 @@ def main():
 
         image_with_collision = detect_collisions(detection_result, numpy_image)
         if (image_with_collision != ""):
-            return image_with_collision
+            yield image_with_collision
         
         # cv2.imshow('Object Detection', image_with_collision)
 
@@ -128,4 +127,3 @@ def main():
     cap.release()
     cv2.destroyAllWindows()
     print("Webcam released and windows closed.")
-    return ""
