@@ -1,7 +1,7 @@
 import requests
 import webbrowser
 import config
-from flask import Flask, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect
 from flask_cors import CORS  # Import CORS to enable cross-origin requests
 import threading
 import time
@@ -66,7 +66,7 @@ def search_sounds():
 
     data = request.get_json()
 
-    query = data.get("query") #required
+    query = data.get("query")  # required
 
     if not query:
         return jsonify({"error": "Query parameter is required"}), 400
@@ -74,17 +74,33 @@ def search_sounds():
     search_url = "https://freesound.org/apiv2/search/text/"
 
     headers = {"Authorization": f"Bearer {access_token}"}
-    params = {"query": query}
+    params = {
+        "query": query,
+        "fields": "id,name,tags,previews"  
+    }
 
-    # Send the GET request to Freesound's API
     response = requests.get(search_url, headers=headers, params=params)
 
-    # Check if the request was successful
     if response.status_code == 200:
-        return jsonify(response.json()) 
+        search_result = response.json()
+
+        if search_result["count"] > 0:
+            first_result = search_result["results"][0]
+
+            # Extract the preview MP3 URL (you can choose between low and high quality)
+            preview_url = first_result["previews"].get("preview-hq-mp3")  # HQ MP3
+            if not preview_url:
+                preview_url = first_result["previews"].get("preview-lq-mp3")  # LQ MP3 as fallback
+
+            if preview_url:
+                return jsonify({"sound_name": first_result["name"], "preview_url": preview_url})
+            else:
+                return jsonify({"error": "No preview URL available"}), 400
+        else:
+            return jsonify({"error": "No results found"}), 404
+
     else:
         return jsonify({"error": "Error with Freesound search", "details": response.text}), 400
-
 
 
 def run_flask():

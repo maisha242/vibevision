@@ -1,9 +1,7 @@
 import './homePage.css';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Box, ButtonGroup, Button, ButtonBase, Table, TableBody, TextField,
-  TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox, TableSortLabel, 
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+  Box, ButtonGroup, Button, ButtonBase
 } from '@mui/material';
 
 function HomePage() {
@@ -88,17 +86,44 @@ function HomePage() {
   
       const data = await response.json();
       console.log('Search Results:', data); 
+  
+      if (data.preview_url) {
+        console.log("Attempting to play sound from URL:", data.preview_url);
+        playSound(data.preview_url);  // Play the sound using the preview URL
+      } else {
+        console.log('No preview URL available for this sound.');
+      }
     } catch (error) {
       console.error('Error:', error);
     }
   }
   
+
+  function playSound(url) {
+    const audio = new Audio(url);
+    
+    audio.play()
+      .then(() => {
+        console.log("Sound is playing...");
+  
+        // Check if the audio duration is greater than 10 seconds
+        if (audio.duration > 5) {
+          setTimeout(() => {
+            audio.pause(); 
+            console.log("Audio stopped after 10 seconds.");
+          }, 5000); // 5 seconds
+        }
+      })
+      .catch((error) => {
+        console.error("Error playing sound:", error);
+      });
+  }
   
 
   async function tryit(){
     freesound_auth();
    // startModel();
-    searchSounds("rawr")
+    searchSounds("clink")
   }
 
   return (
