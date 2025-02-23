@@ -44,6 +44,7 @@ function HomePage() {
 
   async function startModel() {
     try {
+      console.log("maisha remove this")
       const response = await fetch("http://localhost:5005/call_function?param=hello"); 
       if (!response.ok){
           alert("Failed to fetch data");
@@ -54,6 +55,55 @@ function HomePage() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  }
+
+  async function freesound_auth() {
+    try {
+      const response = await fetch('http://localhost:5001/get_access_token');
+      if (!response.ok) {
+        throw new Error('Failed to fetch access token');
+      }
+      const data = await response.json();
+      console.log('Access Token:', data.access_token); 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  
+  async function searchSounds(query, filter = "", sort = "score", groupByPack = "0", weights = "") {
+    try {
+      const payload = {
+        query: query,
+        filter: filter,
+        sort: sort,
+        group_by_pack: groupByPack,
+        weights: weights
+      };
+  
+      const response = await fetch('http://localhost:5001/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+      
+      const data = await response.json();
+      console.log('Search Results:', data);  
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  
+
+  async function tryit(){
+    freesound_auth();
+    startModel();
+   // searchSounds("meow")
   }
 
   return (
@@ -75,7 +125,7 @@ function HomePage() {
         Every Object is an Instrument—<br />Compose Your Reality
       </div>
       <div className='button-box'>
-        <Button variant="contained" className='button' onClick={startModel}>Try It!</Button>
+        <Button variant="contained" className='button' onClick={tryit}>Try It!</Button>
       </div>
     </>
   );
