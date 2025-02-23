@@ -37,8 +37,7 @@ def detect_collisions(results, frame):
                     # make call to openai
 
                     print("" + nameCollision + " hit!")
-                    return openaiwrap.openai_sound(nameCollision)
-    return ""
+                    return nameCollision
     
 def main():
     # Initialize the webcam (0 for the default webcam).
@@ -85,7 +84,7 @@ def main():
 
         # Process detection results.
         if detection_result.detections:
-            print(f"Detected {len(detection_result.detections)} objects.")
+            #print(f"Detected {len(detection_result.detections)} objects.")
 
             # Draw bounding boxes for each detected object.
             for detection in detection_result.detections:
@@ -95,10 +94,10 @@ def main():
                 y = int(bbox.origin_y)
                 w = int(bbox.width)
                 h = int(bbox.height)
-                print(f"Bounding box: x={x}, y={y}, w={w}, h={h}")
+                #print(f"Bounding box: x={x}, y={y}, w={w}, h={h}")
 
                 height, width, _ = numpy_image.shape
-                print(f"Bounding box: x={x}, y={y}, w={w}, h={h}, height={height}, width={width}")
+                #print(f"Bounding box: x={x}, y={y}, w={w}, h={h}, height={height}, width={width}")
 
                 if w + x > width or y + h > height:
                     pass
@@ -116,7 +115,7 @@ def main():
 
         image_with_collision = detect_collisions(detection_result, numpy_image)
         if (image_with_collision != ""):
-            return image_with_collision
+            yield image_with_collision
         
         # cv2.imshow('Object Detection', image_with_collision)
 
@@ -128,4 +127,3 @@ def main():
     cap.release()
     cv2.destroyAllWindows()
     print("Webcam released and windows closed.")
-    return ""

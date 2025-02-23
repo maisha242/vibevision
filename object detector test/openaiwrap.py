@@ -3,6 +3,7 @@ import json
 import config
 
 def openai_sound(item):
+    print("SENDING OPENAI REQUEST FOR " + item)
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
@@ -31,6 +32,3 @@ def openai_sound(item):
     else:
         print(f"Request failed with status code {response.status_code}")
         print("Response:", response.text)
-
-if __name__ == "__main__":
-    openai_chat_completion("lilac")
