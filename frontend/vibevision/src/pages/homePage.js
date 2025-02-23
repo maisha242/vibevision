@@ -43,15 +43,17 @@ function HomePage() {
   async function startModel() {
     try {
       const response = await fetch("http://127.0.0.1:5000/call_function?param=hello"); 
-      if (!response.ok){
+      if (!response.ok) {
         alert("Failed to fetch data");
-      } 
-
-      return response.status;
+      }
+  
+      const data = await response.json();
+      return data.result
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
+  
 
   async function freesound_auth() {
     try {
@@ -122,8 +124,9 @@ function HomePage() {
 
   async function tryit(){
     freesound_auth();
-   // startModel();
-    searchSounds("clink")
+    const word = await startModel();
+    console.log("Playing sound for: ", word)
+    searchSounds(word)
   }
 
   return (

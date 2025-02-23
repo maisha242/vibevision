@@ -25,7 +25,7 @@ def openai_sound(item):
         response_data = response.json()
         # Extract the assistant's response from the API result
         assistant_reply = response_data.get('choices', [{}])[0].get('message', {}).get('content', 'No response content')
-        #print("Assistant's reply:", assistant_reply)
+        # print("Assistant's reply:", assistant_reply)
         return assistant_reply
 
     else:

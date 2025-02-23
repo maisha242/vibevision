@@ -45,7 +45,7 @@ def callback():
         token_data = response.json()
         access_token = token_data["access_token"]
         
-        frontend_url = f"http://localhost:3000?access_token={access_token}"  #front end on 3000 
+        frontend_url = f"http://localhost:3001?access_token={access_token}"  #front end on 3000 
         return redirect(frontend_url) 
     else:
         return jsonify({"error": "Error getting access token", "details": response.text}), 400
