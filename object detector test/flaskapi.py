@@ -21,7 +21,7 @@ def call_function():
         #         break
 
         for i in range(1, 20):
-            yield "" + i + "\n"
+            yield str(i) + "\n"
     return Response(stream_event(), mimetype="text/event-stream")
 
     # Return the result as a response to the GET request
