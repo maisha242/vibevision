@@ -2,12 +2,15 @@ import requests
 import webbrowser
 import config
 from flask import Flask, request, jsonify, redirect
-from flask_cors import CORS  # Import CORS to enable cross-origin requests
+from flask_cors import CORS
 import threading
 import time
 
+# Your Beatoven API token
+BASE_URL = 'https://public-api.beatoven.ai'
+
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
 authurl = "https://freesound.org/apiv2/oauth2/authorize/"
 tokenurl = "https://freesound.org/apiv2/oauth2/access_token/"
@@ -20,7 +23,7 @@ def home():
     auth_redirect_url = (
         f"{authurl}?client_id={config.freesound_id}&response_type=code&redirect_uri={callbackurl}"
     )
-    webbrowser.open(auth_redirect_url)  
+    webbrowser.open(auth_redirect_url)
     return "Moving to Freesound for authentication..."
 
 @app.route("/callback")
@@ -45,10 +48,11 @@ def callback():
         token_data = response.json()
         access_token = token_data["access_token"]
         
-        frontend_url = f"http://localhost:3001?access_token={access_token}"  #front end on 3000 
-        return redirect(frontend_url) 
+        frontend_url = f"http://localhost:3000?access_token={access_token}"
+        return redirect(frontend_url)
     else:
         return jsonify({"error": "Error getting access token", "details": response.text}), 400
+
 
 @app.route("/get_access_token", methods=["GET"])
 def get_access_token():
@@ -57,51 +61,95 @@ def get_access_token():
         return jsonify({"access_token": access_token})
     else:
         return jsonify({"error": "Access token not available"}), 400
-    
-@app.route("/search", methods=["POST"])
-def search_sounds():
-    global access_token
-    if not access_token:
-        return jsonify({"error": "Access token not available"}), 400
 
-    data = request.get_json()
+# Create a new track with the specified prompt
+def create_track(prompt):
+    try:
+        response = requests.post(
+            f'{BASE_URL}/api/v1/tracks',
+            headers={'Authorization': f'Bearer {config.beatoven_key}', 'Content-Type': 'application/json'},
+            json={'prompt': {'text': prompt}}
+        )
 
-    query = data.get("query")  # required
-
-    if not query:
-        return jsonify({"error": "Query parameter is required"}), 400
-
-    search_url = "https://freesound.org/apiv2/search/text/"
-
-    headers = {"Authorization": f"Bearer {access_token}"}
-    params = {
-        "query": query,
-        "fields": "id,name,tags,previews"  
-    }
-
-    response = requests.get(search_url, headers=headers, params=params)
-
-    if response.status_code == 200:
-        search_result = response.json()
-
-        if search_result["count"] > 0:
-            first_result = search_result["results"][0]
-
-            # Extract the preview MP3 URL (you can choose between low and high quality)
-            preview_url = first_result["previews"].get("preview-hq-mp3")  # HQ MP3
-            if not preview_url:
-                preview_url = first_result["previews"].get("preview-lq-mp3")  # LQ MP3 as fallback
-
-            if preview_url:
-                return jsonify({"sound_name": first_result["name"], "preview_url": preview_url})
-            else:
-                return jsonify({"error": "No preview URL available"}), 400
+        if response.status_code == 200:
+            data = response.json()
+            print('Track created:', data)
+            return data['tracks'][0]  # Track ID
         else:
-            return jsonify({"error": "No results found"}), 404
+            return None
+    except Exception as e:
+        print(f"Error creating track: {e}")
+        return None
 
-    else:
-        return jsonify({"error": "Error with Freesound search", "details": response.text}), 400
+# Compose the track using the track ID
+def compose_track(track_id):
+    try:
+        response = requests.post(
+            f'{BASE_URL}/api/v1/tracks/compose/{track_id}',
+            headers={'Authorization': f'Bearer {config.beatoven_key}', 'Content-Type': 'application/json'},
+            json={'format': 'wav', 'looping': False}
+        )
 
+        if response.status_code == 200:
+            data = response.json()
+            print('Composition started:', data)
+            return data['task_id']  # Return task ID
+        else:
+            return None
+    except Exception as e:
+        print(f"Error composing track: {e}")
+        return None
+
+# Check the composition status
+def check_composition_status(task_id):
+    try:
+        response = requests.get(
+            f'{BASE_URL}/api/v1/tasks/{task_id}',
+            headers={'Authorization': f'Bearer {config.beatoven_key}'}
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            print('Composition status:', data)
+
+            if data['status'] == 'composed':
+                return data['meta']['track_url']  # Return the track URL when composed
+            else:
+                print('Track is still being composed.')
+                return None
+        else:
+            return None
+    except Exception as e:
+        print(f"Error checking composition status: {e}")
+        return None
+
+@app.route("/generate_and_play", methods=["POST"])
+def generate_and_play():
+    try:
+        # Step 1: Create the track with the provided prompt
+        prompt = request.json.get("prompt")
+        if not prompt:
+            return jsonify({"error": "Prompt is required"}), 400
+        
+        track_id = create_track(prompt)
+        if not track_id:
+            return jsonify({"error": "Failed to create track"}), 500
+
+        # Step 2: Compose the track
+        task_id = compose_track(track_id)
+        if not task_id:
+            return jsonify({"error": "Failed to start composition"}), 500
+
+        # Step 3: Check the composition status
+        track_url = None
+        while not track_url:
+            track_url = check_composition_status(task_id)
+            if not track_url:
+                time.sleep(5)  # Wait for 5 seconds before checking again
+
+        return jsonify({"track_url": track_url})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 def run_flask():
     app.run(port=5001, debug=True, use_reloader=False)
