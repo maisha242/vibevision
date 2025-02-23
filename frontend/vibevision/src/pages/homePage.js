@@ -1,12 +1,11 @@
 import './homePage.css';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Box, ButtonGroup, Button, ButtonBase
-} from '@mui/material';
+import { Box, ButtonGroup, Button, ButtonBase } from '@mui/material';
+import { useState } from 'react';
 
 function HomePage() {
-
   const navigate = useNavigate();
+  const [currentAudio, setCurrentAudio] = useState(null);  // State to hold the current audio element
 
   function gotoHomePage() {
     try {
@@ -67,13 +66,13 @@ function HomePage() {
       console.error('Error:', error);
     }
   }
-  
+
+  let debounceTimeout = null; // Variable to hold the debounce timeout
+
   async function searchSounds(query) {
     try {
-      const payload = {
-        query: query
-      };
-  
+      const payload = { query: query };
+
       const response = await fetch('http://localhost:5001/search', {
         method: 'POST',
         headers: {
@@ -81,14 +80,14 @@ function HomePage() {
         },
         body: JSON.stringify(payload)
       });
-  
+
       if (!response.ok) {
         throw new Error('Search failed');
       }
-  
+
       const data = await response.json();
-      console.log('Search Results:', data); 
-  
+      console.log('Search Results:', data);
+
       if (data.preview_url) {
         console.log("Attempting to play sound from URL:", data.preview_url);
         playSound(data.preview_url);  // Play the sound using the preview URL
@@ -127,11 +126,10 @@ function HomePage() {
   
   function playSound(url) {
     const audio = new Audio(url);
-    
+
     audio.play()
       .then(() => {
         console.log("Sound is playing...");
-  
         // Check if the audio duration is greater than 5 seconds
         if (audio.duration > 5) {
           setTimeout(() => {
@@ -145,11 +143,9 @@ function HomePage() {
       });
   }
 
-  async function normal(){
+  async function normal() {
     freesound_auth();
-    const word = await startModel();
-    console.log("Playing sound for: ", word)
-    searchSounds(word)
+    startModel();
   }
 
   async function experimental(){
