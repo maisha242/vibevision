@@ -41,7 +41,21 @@ function HomePage() {
       alert(error);
     }
   }
-  
+
+  async function startModel() {
+    try {
+      const response = await fetch("http://localhost:5005/call_function?param=hello"); 
+      if (!response.ok){
+          alert("Failed to fetch data");
+      } 
+      console.log(response.status);
+
+      return response;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
   return (
     <>
       <Box className="nav-box">
@@ -61,7 +75,7 @@ function HomePage() {
         Every Object is an Instrument—<br />Compose Your Reality
       </div>
       <div className='button-box'>
-        <Button variant="contained" className='button'>Try It!</Button>
+        <Button variant="contained" className='button' onClick={startModel}>Try It!</Button>
       </div>
     </>
   );
