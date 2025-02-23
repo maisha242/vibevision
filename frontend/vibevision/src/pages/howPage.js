@@ -41,9 +41,9 @@ function WhatPage() {
         <>
             <Box className="nav-box">
                 <ButtonGroup variant="text">
+                    <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
                     <Button className="nav-buttongroup" onClick={gotoWhatPage}>What?</Button>
                     <Button className="nav-buttongroup" onClick={gotoHowPage}>How?</Button>
-                    <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
                 </ButtonGroup>
             </Box>
 
@@ -59,10 +59,11 @@ function WhatPage() {
                 </div>
 
                 <div className="desc-text">
-                    Object Detection AI model: blank from Google MediaPipe. <br/>
-                    Open Source Sound Database: Freesound. <br/>
-                    Generative AI model: OpenAI ChatGPT. <br/>
-                    Frontend Framework: React. <br/>
+                    Object Detection AI model: EfficientDet-Lite0 from Google MediaPipe <br/>
+                    Open Source Sound Database: Freesound <br/>
+                    Generative AI model: OpenAI GPT-4o Mini <br/>
+                    Text to Music AI model: Beatoven.ai <br/>
+                    Frontend Framework: React <br/>
                     Backend Framework: Flask <br/>
                 </div>
             </div>

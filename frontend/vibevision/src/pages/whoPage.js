@@ -41,9 +41,9 @@ function WhoPage() {
         <>
             <Box className="nav-box">
                 <ButtonGroup variant="text">
+                    <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
                     <Button className="nav-buttongroup" onClick={gotoWhatPage}>What?</Button>
                     <Button className="nav-buttongroup" onClick={gotoHowPage}>How?</Button>
-                    <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
                 </ButtonGroup>
             </Box>
 
@@ -61,7 +61,6 @@ function WhoPage() {
                 <div className="desc-text">
                     Our names are Maisha Iqbal and Roshan Nunna. <br/>
                     We are two graduating seniors @ RIT in Software Engineering and Computer Science, respectively. <br/>
-                    We made this fun project during RIT's annual hackathon: Brickhack 11. <br/>
                     Fun fact: This is inspired by a project we collaborated on during our first Brickhack (7) in our freshman year. <br/>
                     </div>
             </div>

@@ -41,9 +41,9 @@ function WhatPage() {
         <>
             <Box className="nav-box">
                 <ButtonGroup variant="text">
+                    <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
                     <Button className="nav-buttongroup" onClick={gotoWhatPage}>What?</Button>
                     <Button className="nav-buttongroup" onClick={gotoHowPage}>How?</Button>
-                    <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
                 </ButtonGroup>
             </Box>
 
@@ -61,7 +61,8 @@ function WhatPage() {
                 <div className="desc-text">
                     VibeVision is an interactive experience that combines real-time object detection with immersive soundscapes. <br/>
                     Using your camera, it detects objects in your environment and triggers sound effects with each item.<br/>
-                    From bass drops to synth melodies, VibeVision turns everyday objects into musical instruments.<br/>
+                    So you can turn turns everyday objects into musical instruments without the price point.<br/>
+                    Also, try our new Experimental version: make a unique melody based on your object!<br/>
                 </div>
             </div>
         </>

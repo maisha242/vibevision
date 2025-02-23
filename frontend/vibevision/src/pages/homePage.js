@@ -167,9 +167,9 @@ function HomePage() {
     <>
       <Box className="nav-box">
         <ButtonGroup variant="text">
+          <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
           <Button className="nav-buttongroup" onClick={gotoWhatPage}>What?</Button>
           <Button className="nav-buttongroup" onClick={gotoHowPage}>How?</Button>
-          <Button className="nav-buttongroup" onClick={gotoWhoPage}>Who?</Button>
         </ButtonGroup>
       </Box>
 
