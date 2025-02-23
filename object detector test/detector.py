@@ -2,7 +2,33 @@ import mediapipe as mp
 import cv2
 import numpy as np
 
-model_path = './vibevision/efficientdet_lite2.tflite'  # Model file path.
+model_path = './vibevision/efficientdet_lite0.tflite'  # Model file path.
+
+def check_collision(box1, box2):
+    x1, y1, x2, y2 = box1
+    x3, y3, x4, y4 = box2
+    return not (x2 < x3 or x1 > x4 or y1 > y4 or y2 < y3)
+
+def detect_collisions(results, frame):
+    h, w, _ = frame.shape
+    if results.detections:
+        boxes = []
+        names = []
+        for detection in results.detections:
+            box = detection.bounding_box
+            names.append(detection.categories[0].category_name)
+            x, y, width, height = int(box.origin_x * w), int(box.origin_y * h), int(box.width * w), int(box.height * h)
+            boxes.append((x, y, x + width, y + height))
+            cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
+        
+        for i in range(len(boxes)):
+            for j in range(i + 1, len(boxes)):
+                if check_collision(boxes[i], boxes[j]):
+                    cv2.rectangle(frame, (boxes[i][0], boxes[i][1]), (boxes[i][2], boxes[i][3]), (255, 0, 0), 2)
+                    cv2.rectangle(frame, (boxes[j][0], boxes[j][1]), (boxes[j][2], boxes[j][3]), (255, 0, 0), 2)
+                    print("COLLLISION BETWEEN !" + names[i] + " AND " + names[j])
+
+    return frame
 
 # Initialize the webcam (0 for the default webcam).
 cap = cv2.VideoCapture(0)
@@ -21,10 +47,10 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 # Set up the options for ObjectDetector in image mode.
 options = ObjectDetectorOptions(
     base_options=BaseOptions(model_asset_path=model_path),
-    max_results=5,
+    max_results=2,
     running_mode=VisionRunningMode.IMAGE,
-    score_threshold=0.5,
-    category_denylist = ["Person", "person"]
+    score_threshold=0.18,
+    category_denylist = ["Person", "person", "dining table"]
 )
 
 # Create the object detector.
@@ -70,13 +96,15 @@ while True:
                     # Draw a rectangle around the detected object.
                     cv2.rectangle(numpy_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
                     # add text
-                    for cat in detection.categories:
-                        cv2.putText(numpy_image, cat.category_name, (x + w, y + h), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                    cv2.putText(numpy_image, detection.categories[0].category_name, (x + w, y + h), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
                 except Exception as e:
                     print(f"An error occurred: {e}")
 
     # Display the resulting frame with bounding boxes.
     cv2.imshow('Object Detection - Press Q to Exit', numpy_image)
+
+    image_with_collision = detect_collisions(detection_result, numpy_image)
+    # cv2.imshow('Object Detection', image_with_collision)
 
     # Break the loop if 'Q' is pressed.
     if cv2.waitKey(1) & 0xFF == ord('q'):
