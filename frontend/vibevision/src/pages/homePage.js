@@ -44,14 +44,12 @@ function HomePage() {
 
   async function startModel() {
     try {
-      console.log("maisha remove this")
-      const response = await fetch("http://localhost:5005/call_function?param=hello"); 
+      const response = await fetch("http://127.0.0.1:5000/call_function?param=hello"); 
       if (!response.ok){
-          alert("Failed to fetch data");
+        alert("Failed to fetch data");
       } 
-      console.log(response.status);
 
-      return response;
+      return response.status;
     } catch (error) {
       console.error("Error fetching data:", error);
     }

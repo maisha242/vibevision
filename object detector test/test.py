@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 def main():
-    model_path = './efficientdet_lite2.tflite'
+    model_path = './vibevision/efficientdet_lite2.tflite'
 
     BaseOptions = mp.tasks.BaseOptions
     DetectionResult = mp.tasks.components.containers.DetectionResult
