@@ -3,6 +3,7 @@ import json
 import config
 
 def openai_sound(item):
+    print("SENDING OPENAI REQUEST FOR " + item)
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",

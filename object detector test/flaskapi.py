@@ -1,21 +1,28 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
 import soundfromimage
+import time
 
 app = Flask(__name__)
 
 # Allow all origins
 CORS(app, resources={r"/*": {"origins": "*"}})
+
 @app.route('/call_function', methods=['GET'])
 def call_function():
     # Retrieve any parameters from the GET request if needed
     param = request.args.get('param', default=None)
 
-    # Call the function from another file
-    result = soundfromimage.main()
+    def stream_event():
+        last_chunk = None  # To track the previous chunk
 
-    # Return the result as a response to the GET request
-    return jsonify({"result": result})
+        for chunk in soundfromimage.main():
+            if chunk != None:
+                # Emit the collision name as a message
+                yield f"data: {chunk}\n\n"  # Send chunk (nameCollision) as a message to the client
+
+
+    return Response(stream_event(), mimetype="text/event-stream")
 
 if __name__ == "__main__":
     app.run()
