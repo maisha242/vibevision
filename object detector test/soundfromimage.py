@@ -1,8 +1,9 @@
 import test
 import openaiwrap
 import detector
-def main():
 
+
+def main():
     #current_item = test.get_currentitem()
     current_item = detector.main()
     while current_item == "":

@@ -53,7 +53,7 @@ function HomePage() {
       console.error("Error fetching data:", error);
     }
   }
-  
+
 
   async function freesound_auth() {
     try {
@@ -100,7 +100,31 @@ function HomePage() {
     }
   }
   
-
+  async function generateAndPlayTrack(prompt) {
+    try {
+      const response = await fetch('http://localhost:5001/generate_and_play', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: prompt }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Track generation failed');
+      }
+  
+      const data = await response.json();
+      const trackUrl = data.track_url;
+  
+      // Play the generated track
+      const audio = new Audio(trackUrl);
+      audio.play();
+    } catch (error) {
+      console.error('Error generating and playing track:', error);
+    }
+  }
+  
   function playSound(url) {
     const audio = new Audio(url);
     
@@ -108,11 +132,11 @@ function HomePage() {
       .then(() => {
         console.log("Sound is playing...");
   
-        // Check if the audio duration is greater than 10 seconds
+        // Check if the audio duration is greater than 5 seconds
         if (audio.duration > 5) {
           setTimeout(() => {
             audio.pause(); 
-            console.log("Audio stopped after 10 seconds.");
+            console.log("Audio stopped after 5 seconds.");
           }, 5000); // 5 seconds
         }
       })
@@ -120,13 +144,19 @@ function HomePage() {
         console.error("Error playing sound:", error);
       });
   }
-  
 
-  async function tryit(){
+  async function normal(){
     freesound_auth();
     const word = await startModel();
     console.log("Playing sound for: ", word)
     searchSounds(word)
+  }
+
+  async function experimental(){
+    freesound_auth();
+    const word = await startModel();
+    console.log("Playing sound for: ", word)
+    generateAndPlayTrack(word);
   }
 
   return (
@@ -148,7 +178,8 @@ function HomePage() {
         Every Object is an Instrument—<br />Compose Your Reality
       </div>
       <div className='button-box'>
-        <Button variant="contained" className='button' onClick={tryit}>Try It!</Button>
+        <Button variant="contained" className='button' onClick={normal}>Normal</Button>
+        <Button variant="contained" className='button' onClick={experimental}>Experimental</Button>
       </div>
     </>
   );
