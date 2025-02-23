@@ -14,11 +14,14 @@ def call_function():
 
     # Call the function from another file
     def stream_event():
-        for chunk in soundfromimage.main():
-            if (chunk != None):
-                yield chunk + "\n"
-            else:
-                break
+        # for chunk in soundfromimage.main():
+        #     if (chunk != None):
+        #         yield chunk + "\n"
+        #     else:
+        #         break
+
+        for i in range(1, 20):
+            yield "" + i + "\n"
     return Response(stream_event(), mimetype="text/event-stream")
 
     # Return the result as a response to the GET request
